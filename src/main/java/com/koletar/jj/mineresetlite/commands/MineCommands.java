@@ -58,12 +58,12 @@ public class MineCommands {
         Mine mine = mines[0];
         Set<Material> set = Sets.newHashSet();
         Location location = player.getTargetBlock(set, 100).getLocation();
-        if (args.length == 0) {
+        if (args.length == 1) {
             //Use block being looked at
             player.sendMessage(phrase("teleportLocationSet"));
             mine.setTeleportLocation(location);
             return;
-        } else if (args[0].equalsIgnoreCase("-feet")) {
+        } else if (args[1].equalsIgnoreCase("-feet")) {
             //Use block being stood on
             location = player.getLocation();
             player.sendMessage(phrase("teleportLocationSet"));
