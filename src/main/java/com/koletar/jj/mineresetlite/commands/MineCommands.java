@@ -38,42 +38,6 @@ public class MineCommands {
         sender.sendMessage(phrase("mineList", StringTools.buildList(plugin.mines, "&c", "&d, ")));
     }
 
-    @Command(aliases = {"teleportloc", "tpl", "teleloc"},
-      description = "Set the point for the mine to teleport players to on reset",
-      help = {"Run this command to set a mines teleport point to the block you are looking at.",
-        "Use /mrl teleportloc -feet to set a mines teleport point to the location you are standing on."},
-      usage = "(-feet)",
-      permissions = {"mineresetlite.mine.create", "mineresetlite.mine.redefine"},
-      min = 1, max = 2, onlyPlayers = true)
-    public void setTeleportLocation(CommandSender sender, String[] args) throws InvalidCommandArgumentsException {
-        Player player = (Player) sender;
-        Mine[] mines = plugin.matchMines(StringTools.buildSpacedArgument(args, 2));
-        if (mines.length > 1) {
-            sender.sendMessage(phrase("tooManyMines"));
-            return;
-        } else if (mines.length == 0) {
-            sender.sendMessage(phrase("noMinesMatched"));
-            return;
-        }
-        Mine mine = mines[0];
-        Set<Material> set = Sets.newHashSet();
-        Location location = player.getTargetBlock(set, 100).getLocation();
-        if (args.length == 1) {
-            //Use block being looked at
-            player.sendMessage(phrase("teleportLocationSet"));
-            mine.setTeleportLocation(location);
-            return;
-        } else if (args[1].equalsIgnoreCase("-feet")) {
-            //Use block being stood on
-            location = player.getLocation();
-            player.sendMessage(phrase("teleportLocationSet"));
-            mine.setTeleportLocation(location);
-            return;
-        }
-        //Args weren't empty or -feet, bad args
-        throw new InvalidCommandArgumentsException();
-    }
-
     @Command(aliases = {"pos1", "p1"},
             description = "Change your first selection point",
             help = {"Run this command to set your first selection point to the block you are looking at.",
@@ -393,6 +357,35 @@ public class MineCommands {
             MineResetLite.broadcast(phrase("mineResetBroadcast", mines[0], sender), mines[0]);
             mines[0].reset();
         }
+    }
+
+    @Command(aliases = {"teleportlocation", "tpl", "teleportloc"},
+      description = "Set the point for the mine to teleport players to on reset",
+      help = {"Run this command to set a mines teleport point to the block you are looking at.",
+        "Use /mrl teleportloc -feet to set a mines teleport point to the location you are standing on."},
+      usage = "<mine>",
+      permissions = {"mineresetlite.mine.create", "mineresetlite.mine.redefine"},
+      min = 1, max = 2, onlyPlayers = true)
+    public void setTeleportLocation(CommandSender sender, String[] args) throws InvalidCommandArgumentsException {
+        Player player = (Player) sender;
+        Mine[] mines = plugin.matchMines(StringTools.buildSpacedArgument(args));
+        if (mines.length > 1) {
+            sender.sendMessage(phrase("tooManyMines"));
+            return;
+        } else if (mines.length == 0) {
+            sender.sendMessage(phrase("noMinesMatched"));
+            return;
+        }
+        Mine mine = mines[0];
+        Location location = player.getLocation();
+        if (args.length == 1) {
+            //Use block being looked at
+            player.sendMessage(phrase("teleportLocationSet", mine));
+            mine.setTeleportLocation(location);
+            return;
+        }
+        //Args weren't empty or -feet, bad args
+        throw new InvalidCommandArgumentsException();
     }
 
     @Command(aliases = {"flag", "f"},
